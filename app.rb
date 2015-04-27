@@ -3,7 +3,7 @@ require 'bundler/setup'
 Bundler.require(:default)
 
 
-get '/' do
+get '/?' do
   erb :map
 end
 
