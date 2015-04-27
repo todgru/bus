@@ -47,7 +47,9 @@ function showBus( bus ) {
       position: new google.maps.LatLng(bus[i][1], bus[i][2]),
       map: map,
       fontSize: 20,
-      align: 'center'
+      strokeWeight: 1,
+      align: 'center',
+      minZoom: 15
     });
 
     // Display bearing as a fancy arrow
@@ -77,7 +79,7 @@ function showBus( bus ) {
 // determine direction - KISS: N, S, E or W
 //
 function getBearingCoor( lat, lon, bearing ) {
-  var shift = 0.0001;
+  var shift = 0.000001;
   // heading north
   if (bearing > 315 || bearing <= 45 ) {
     return [lat + shift, lon];
