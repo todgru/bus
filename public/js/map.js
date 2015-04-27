@@ -1,109 +1,105 @@
+/*global google, BM, MapLabel*/
 
-function showBus( bus ) {
+(function () {
+  "use strict";
+  window.BM = window.BM || {};
+  window.BM.map = {
 
-  var mapOptions = {
-    zoom: 14,
-    center: new google.maps.LatLng(45.523059, -122.667701)
-  };
+    map: null,
+    api: null,
+    mapOptions: {
+      zoom: 14,
+      center: new google.maps.LatLng(45.523059, -122.667701)
+    },
 
-  var map = new google.maps.Map(document.getElementById('map-canvas'),
-      mapOptions);
+    // triangle: {
+    //   path: 'M 0 -5 L -5 5 L 5 5 z',
+    //   fillColor: 'green',
+    //   fillOpacity: 0.8,
+    //   scale: 1,
+    //   strokeColor: 'green',
+    //   strokeWeight: 0
+    // },
 
-  var triangle = {
-    path: 'M 0 -5 L -5 5 L 5 5 z',
-    fillColor: 'green',
-    fillOpacity: 0.8,
-    scale: 1,
-    strokeColor: 'green',
-    strokeWeight: 0,
-  }
+    initialize: function () {
+      this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
+      this.api = new BM.Api('/bus', _.bind(this.showBus, this));
+    },
 
-  var circleLabel, maplabel, marker, i;
+    showBus: function (buses) {
+      var circleLabel, mapLabel, marker, lineSymbol, arr, lineCoordinates, line;
 
-  // iterate through all the vehicles
-  for (i = 0; i < bus.length; i++) {
-    // Display Bus route number
-    mapLabel = new MapLabel({
-      text: bus[i][0],
-      position: new google.maps.LatLng(bus[i][1], bus[i][2]),
-      map: map,
-      fontSize: 20,
-      strokeWeight: 1,
-      align: 'center',
-      minZoom: 15
-    });
+      // iterate through all the vehicles
+      _.each(buses, function (bus) {
+        // Display Bus route number
+        mapLabel = new MapLabel({
+          text: bus[0],
+          position: new google.maps.LatLng(bus[1], bus[2]),
+          map: this.map,
+          fontSize: 20,
+          strokeWeight: 1,
+          align: 'center',
+          minZoom: 15
+        });
 
-    // Display bearing as a fancy arrow
-    var lineSymbol = {
-      path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
-    };
-    var arr = getBearingCoor(bus[i][1], bus[i][2], bus[i][3]);
-    var lineCoordinates = [
-      new google.maps.LatLng(bus[i][1], bus[i][2]),
-      new google.maps.LatLng(arr[0], arr[1]),
-    ];
-    var line = new google.maps.Polyline({
-        path: lineCoordinates,
-        icons: [{
-          icon: lineSymbol,
-          offset: '100%'
-        }],
-        map: map
-      });
-  }
+        // Display bearing as a fancy arrow
+        lineSymbol = {
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
+        };
 
-  // only show markers that are in the viewport
-  // @todo needs to be implemented
-  google.maps.event.addListener(map, 'idle', showMarkers);
-}
+        arr = this.getBearingCoor(bus[1], bus[2], bus[3]);
 
-// determine direction - KISS: N, S, E or W
-//
-function getBearingCoor( lat, lon, bearing ) {
-  var shift = 0.000001;
-  // heading north
-  if (bearing > 315 || bearing <= 45 ) {
-    return [lat + shift, lon];
-  }
-  // heading east
-  if (bearing > 45 && bearing <= 135 ) {
-    return [lat, lon + shift]; 
-  }
-  // heading south 
-  if (bearing > 135 && bearing <= 225 ) {
-    return [lat - shift, lon]; 
-  }
-  // heading west
-  if (bearing > 225 && bearing <= 315 ) {
-    return [lat, lon - shift]; 
-  }
-  return [lat, lon]; 
-}
+        lineCoordinates = [
+          new google.maps.LatLng(bus[1], bus[2]),
+          new google.maps.LatLng(arr[0], arr[1]),
+        ];
 
-// Ask for data
-//
-function getJSON( uri, callback ) {
-  var request = new XMLHttpRequest();
-  request.open('GET', uri, true);
-  request.onload = function() {
-    if (request.status >= 200 && request.status < 400) {
-      // Success!
-      var data = JSON.parse(request.responseText);
-      callback( data );
-    } else {
-      // We reached our target server, but it returned an error
-      console.error(request.responseText);
+        line = new google.maps.Polyline({
+          path: lineCoordinates,
+          icons: [{
+            icon: lineSymbol,
+            offset: '100%'
+          }],
+          map: this.map
+        });
+
+      }, this);
+
+      // only show markers that are in the viewport
+      // @todo needs to be implemented
+      google.maps.event.addListener(this.map, 'idle', this.showMarkers);
+    },
+
+    showMarkers: function () {
+      // nothing here yet...
+    },
+
+    // determine direction - KISS: N, S, E or W
+    getBearingCoor: function (lat, lon, bearing) {
+      var shift = 0.000001;
+      // heading north
+      if (bearing > 315 || bearing <= 45) {
+        return [lat + shift, lon];
+      }
+      // heading east
+      if (bearing > 45 && bearing <= 135) {
+        return [lat, lon + shift];
+      }
+      // heading south
+      if (bearing > 135 && bearing <= 225) {
+        return [lat - shift, lon];
+      }
+      // heading west
+      if (bearing > 225 && bearing <= 315) {
+        return [lat, lon - shift];
+      }
+      return [lat, lon];
     }
   };
-  request.onerror = function(response) {
-    console.error(response.target.responseText);
-  };
-  request.send();
-}
 
-// @todo
-//
-function showMarkers(){
-}
+  // when google map loads we kick off the module...
+  google.maps.event.addDomListener(window, 'load', _.bind(BM.map.initialize, BM.map));
 
-google.maps.event.addDomListener(window, 'load', getJSON('bus', showBus));
+}());
+
+
