@@ -111,12 +111,11 @@ function getJSON( uri, callback ) {
       callback( data );
     } else {
       // We reached our target server, but it returned an error
-      console.log('Reached destination server, returned < 200 or > 400.');
+      console.error(request.responseText);
     }
   };
-  request.onerror = function() {
-    // There was a connection error of some sort
-    console.log('onerror: error GETing data');
+  request.onerror = function(response) {
+    console.error(response.target.responseText);
   };
   request.send();
 }
