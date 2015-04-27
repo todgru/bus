@@ -6,20 +6,21 @@ window.BM.Api = (function () {
 
   function Api(uri, callback) {
     this.callback = callback;
+    this.uri = uri;
     this.request = new XMLHttpRequest();
-    this.request.open('GET', uri, true);
     this.request.onload = _.bind(this.loaded, this);
     this.request.onerror = _.bind(this.showError, this);
-    this.request.send();
   }
 
   Api.prototype = {
+    uri: '',
     request: null,
     callback: null,
 
     // will eventually use this for polling,
     // will stay setup, just call refresh for another fetch
-    refresh: function () {
+    fetch: function () {
+      this.request.open('GET', this.uri, true);
       this.request.send();
     },
 

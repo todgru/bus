@@ -7,6 +7,9 @@
 
     map: null,
     api: null,
+    labels: [],
+    arrows: [],
+    refreshInterval: 5000,
     mapOptions: {
       zoom: 14,
       center: new google.maps.LatLng(45.523059, -122.667701)
@@ -24,11 +27,25 @@
     initialize: function () {
       this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
       this.api = new BM.Api('/bus', _.bind(this.showBus, this));
+      this.api.fetch();
+    },
+
+    clearAll: function () {
+      _.each(this.labels, function (label) {
+        label.setMap(null);
+      }, this);
+
+      _.each(this.arrows, function (arrow) {
+        arrow.setMap(null);
+      }, this);
+
+      this.labels = this.arrows = [];
     },
 
     showBus: function (buses) {
-      var circleLabel, mapLabel, marker, lineSymbol, arr, lineCoordinates, line;
+      var arrow, mapLabel, lineSymbol, arr, lineCoordinates;
 
+      this.clearAll();
       // iterate through all the vehicles
       _.each(buses, function (bus) {
         // Display Bus route number
@@ -54,7 +71,7 @@
           new google.maps.LatLng(arr[0], arr[1]),
         ];
 
-        line = new google.maps.Polyline({
+        arrow = new google.maps.Polyline({
           path: lineCoordinates,
           icons: [{
             icon: lineSymbol,
@@ -63,11 +80,20 @@
           map: this.map
         });
 
+        this.labels.push(mapLabel);
+        this.arrows.push(arrow);
+
       }, this);
+
+      _.delay(_.bind(this.refresh, this), this.refreshInterval);
 
       // only show markers that are in the viewport
       // @todo needs to be implemented
       google.maps.event.addListener(this.map, 'idle', this.showMarkers);
+    },
+
+    refresh: function () {
+      this.api.fetch();
     },
 
     showMarkers: function () {
