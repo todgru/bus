@@ -17,12 +17,8 @@ def json(arg)
 end
 
 def bus
-  veh = Array.new
-  vehicles = get['resultSet']['vehicle']
-  vehicles.each do |v|
-    # bus name, lat, long, bearing
-    veh.push([v['routeNumber'], v['latitude'], v['longitude'], v['bearing'], v['signMessage']])
-  end
+  result_set = indifferent_params get['resultSet']['vehicle']
+  veh = result_set.map {|v| [v[:routeNumber], v[:latitude], v[:longitude], v[:bearing], v[:signMessage]]}
   json(veh) 
 end
 
@@ -31,6 +27,12 @@ end
 def get
   appid = ENV['TRIMET_APP_ID']
   response = Unirest.get( "http://developer.trimet.org/ws/v2/vehicles?appid=#{appid}" )
+  
+  if response.code > 200
+    # if not a 200 throw the error
+    halt response.code, {'Content-Type' => 'text/json'}, response.body.to_s
+  end
+  
   response.body
 end
 

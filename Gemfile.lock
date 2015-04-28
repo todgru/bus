@@ -20,6 +20,8 @@ GEM
     rest-client (1.6.8)
       mime-types (~> 1.16)
       rdoc (>= 2.4.2)
+    shotgun (0.9.1)
+      rack (>= 1.0)
     sinatra (1.4.6)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -39,5 +41,6 @@ DEPENDENCIES
   bundler
   json
   pry
+  shotgun
   sinatra
   unirest
