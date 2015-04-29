@@ -8,4 +8,5 @@ group :default do
   gem 'pry'
   gem 'sinatra'
   gem 'unirest'
+  gem 'dotenv'
 end
