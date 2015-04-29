@@ -14,8 +14,8 @@
     <script src="//maps.googleapis.com/maps/api/js?v=3.exp&amp;signed_in=true&amp;sensor=true"></script>
     <script src="//google-maps-utility-library-v3.googlecode.com/svn/trunk/maplabel/src/maplabel.js"></script>
     <script src="/js/vendor/underscore_1.8.3.min.js"></script>
-    <script src="/js/vendor/geolocationmarker-compiled.js"></script>
-    <script src="/js/Api.js"></script>
-    <script src="/js/map.js"></script>
+    <!--<script src="/js/vendor/geolocationmarker-compiled.js"></script>-->
+    <script src="/js/Api.js?nocache=<%= Time.now.to_f %>"></script>
+    <script src="/js/map.js?nocache<%= Time.now.to_f %>"></script>
   </body>
 </html>

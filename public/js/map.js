@@ -10,11 +10,6 @@
     labels: [],
     arrows: [],
     refreshInterval: 5000,
-    mapOptions: {
-      zoom: 16,
-      center: new google.maps.LatLng(45.523059, -122.667701),
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    },
 
     // triangle: {
     //   path: 'M 0 -5 L -5 5 L 5 5 z',
@@ -26,12 +21,16 @@
     // },
 
     initialize: function () {
-
-      this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
-
+      var mapOptions = {
+        zoom: 16,
+        center: new google.maps.LatLng(45.523059, -122.667701),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      
+      this.map  = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
       this.api = new BM.Api('/bus', _.bind(this.showBus, this));
       this.findUserLocation();
-      this.api.fetch();
+      // this.api.fetch();
 
     },
 
@@ -90,7 +89,7 @@
 
       }, this);
 
-      _.delay(_.bind(this.refresh, this), this.refreshInterval);
+      // _.delay(_.bind(this.refresh, this), this.refreshInterval);
 
       // only show markers that are in the viewport
       // @todo needs to be implemented
@@ -106,13 +105,23 @@
     },
 
     findUserLocation: function () {
-      var marker, geolocate;
+      var marker, geolocate, initialLocation;
+      
+      alert('was called');
+      
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(_.bind(function (position) {
           geolocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          this.map.setCenter(geolocate);
-          marker = new GeolocationMarker(this.map);
-        }, this));
+          initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          this.map.setCenter(initialLocation);
+          console.log(geolocate);
+          // marker = new GeolocationMarker(this.map);
+        }, this), function () {
+          console.dir(arguments);
+          alert('failed');
+        });
+      } else {
+        alert('Please make sure that location services are enabled for your browser.');
       }
     },
 
