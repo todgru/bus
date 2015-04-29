@@ -1,4 +1,4 @@
-/*global google, BM, MapLabel, navigator, GeolocationMarker*/
+/*global google, BM, MapLabel, alert, navigator, GeolocationMarker*/
 
 (function () {
   "use strict";
@@ -10,6 +10,11 @@
     labels: [],
     arrows: [],
     refreshInterval: 5000,
+    locationMarker: null,
+    mapOptions: {
+      zoom: 14,
+      center: {}
+    },
 
     // triangle: {
     //   path: 'M 0 -5 L -5 5 L 5 5 z',
@@ -21,17 +26,38 @@
     // },
 
     initialize: function () {
-      var mapOptions = {
-        zoom: 16,
-        center: new google.maps.LatLng(45.523059, -122.667701),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      };
-      
-      this.map  = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-      this.api = new BM.Api('/bus', _.bind(this.showBus, this));
-      this.findUserLocation();
-      // this.api.fetch();
+      // set to portland so that if we dont find a location it defaults to that...
+      this.mapOptions.center = new google.maps.LatLng(45.523059, -122.667701);
 
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(_.bind(this.locationSuccess, this), _.bind(this.locationError, this));
+      } else {
+        // dont have navigator.geolocation so continue on
+        this.buildMap();
+      }
+    },
+
+    locationSuccess: function (position) {
+      this.mapOptions.center = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      this.mapOptions.zoom = 16;
+      // zoom in more, we know where user is
+      this.buildMap();
+
+      this.locationMarker = new google.maps.Marker({
+        position: this.mapOptions.center,
+        map: this.map
+      });
+    },
+
+    locationError: function (error) {
+      alert('ERROR(' + error.code + '): ' + error.message);
+      this.buildMap();
+    },
+
+    buildMap: function () {
+      this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
+      this.api = new BM.Api('/bus', _.bind(this.showBus, this));
+      this.api.fetch();
     },
 
     clearAll: function () {
@@ -89,7 +115,7 @@
 
       }, this);
 
-      // _.delay(_.bind(this.refresh, this), this.refreshInterval);
+      _.delay(_.bind(this.refresh, this), this.refreshInterval);
 
       // only show markers that are in the viewport
       // @todo needs to be implemented
@@ -102,27 +128,6 @@
 
     showMarkers: function () {
       // nothing here yet...
-    },
-
-    findUserLocation: function () {
-      var marker, geolocate, initialLocation;
-      
-      alert('was called');
-      
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(_.bind(function (position) {
-          geolocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          this.map.setCenter(initialLocation);
-          console.log(geolocate);
-          // marker = new GeolocationMarker(this.map);
-        }, this), function () {
-          console.dir(arguments);
-          alert('failed');
-        });
-      } else {
-        alert('Please make sure that location services are enabled for your browser.');
-      }
     },
 
     // determine direction - KISS: N, S, E or W
