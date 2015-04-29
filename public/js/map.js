@@ -1,4 +1,4 @@
-/*global google, BM, MapLabel*/
+/*global google, BM, MapLabel, navigator, GeolocationMarker*/
 
 (function () {
   "use strict";
@@ -11,8 +11,9 @@
     arrows: [],
     refreshInterval: 5000,
     mapOptions: {
-      zoom: 14,
-      center: new google.maps.LatLng(45.523059, -122.667701)
+      zoom: 16,
+      center: new google.maps.LatLng(45.523059, -122.667701),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
     },
 
     // triangle: {
@@ -25,9 +26,13 @@
     // },
 
     initialize: function () {
+
       this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
+
       this.api = new BM.Api('/bus', _.bind(this.showBus, this));
+      this.findUserLocation();
       this.api.fetch();
+
     },
 
     clearAll: function () {
@@ -98,6 +103,17 @@
 
     showMarkers: function () {
       // nothing here yet...
+    },
+
+    findUserLocation: function () {
+      var marker, geolocate;
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(_.bind(function (position) {
+          geolocate = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          this.map.setCenter(geolocate);
+          marker = new GeolocationMarker(this.map);
+        }, this));
+      }
     },
 
     // determine direction - KISS: N, S, E or W
