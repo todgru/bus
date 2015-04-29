@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'bundler/setup'
 Bundler.require(:default)
-
+Dotenv.load
 
 get '/?' do
   erb :map
@@ -25,8 +25,7 @@ end
 # return raw bus schedule
 #
 def get
-  appid = ENV['TRIMET_APP_ID']
-  response = Unirest.get( "http://developer.trimet.org/ws/v2/vehicles?appid=#{appid}" )
+  response = Unirest.get( "http://developer.trimet.org/ws/v2/vehicles?appid=#{ENV['TRIMET_APP_ID']}" )
   
   if response.code > 200
     # if not a 200 throw the error
