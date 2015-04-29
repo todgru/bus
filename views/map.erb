@@ -125,7 +125,7 @@ function getJSON( uri, callback ) {
 function showMarkers(){
 }
 
-google.maps.event.addDomListener(window, 'load', getJSON('bus', showBus));
+google.maps.event.addDomListener(window, 'load', getJSON(window.location.href + '/bus', showBus));
 
     </script>
   </head>
