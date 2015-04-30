@@ -26,7 +26,7 @@
 
     initialize: function () {
       this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
-      this.api = new BM.Api('/bus', _.bind(this.showBus, this));
+      this.api = new BM.Api('/locations', _.bind(this.showBus, this));
       this.api.fetch();
     },
 
