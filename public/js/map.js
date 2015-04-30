@@ -10,7 +10,7 @@
     labels: [],
     arrows: [],
     refreshInterval: 5000,
-    url: '/locations',
+    url: 'locations',
     mapOptions: {
       zoom: 14,
       center: new google.maps.LatLng(45.523059, -122.667701)
@@ -103,7 +103,7 @@
     // Set this.url with the viewport bounds
     //
     getViewport: function (map) {
-      this.url = '/locations?nelat=' + map.getBounds().getNorthEast().lat()
+      this.url = 'locations?nelat=' + map.getBounds().getNorthEast().lat()
                  + '&nelon=' + map.getBounds().getNorthEast().lng()
                  + '&swlat=' + map.getBounds().getSouthWest().lat()
                  + '&swlon=' + map.getBounds().getSouthWest().lng();
