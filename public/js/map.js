@@ -1,4 +1,4 @@
-/*global google, BM, MapLabel*/
+/*global google, BM, MapLabel, alert, navigator, GeolocationMarker*/
 
 (function () {
   "use strict";
@@ -10,10 +10,11 @@
     labels: [],
     arrows: [],
     refreshInterval: 5000,
+    locationMarker: null,
     url: 'locations',
     mapOptions: {
       zoom: 14,
-      center: new google.maps.LatLng(45.523059, -122.667701)
+      center: {}
     },
 
     // triangle: {
@@ -26,6 +27,35 @@
     // },
 
     initialize: function () {
+      // set to portland so that if we dont find a location it defaults to that...
+      this.mapOptions.center = new google.maps.LatLng(45.523059, -122.667701);
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(_.bind(this.locationSuccess, this), _.bind(this.locationError, this));
+      } else {
+        // dont have navigator.geolocation so continue on
+        this.buildMap();
+      }
+    },
+
+    locationSuccess: function (position) {
+      this.mapOptions.center = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      this.mapOptions.zoom = 16;
+      // zoom in more, we know where user is
+      this.buildMap();
+
+      this.locationMarker = new google.maps.Marker({
+        position: this.mapOptions.center,
+        map: this.map
+      });
+    },
+
+    locationError: function (error) {
+      alert('ERROR(' + error.code + '): ' + error.message);
+      this.buildMap();
+    },
+
+    buildMap: function () {
       this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
       this.api = new BM.Api( this.url , _.bind(this.showBus, this));
       this.api.fetch();
