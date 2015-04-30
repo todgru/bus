@@ -10,6 +10,7 @@
     labels: [],
     arrows: [],
     refreshInterval: 5000,
+    url: '/locations',
     mapOptions: {
       zoom: 14,
       center: new google.maps.LatLng(45.523059, -122.667701)
@@ -26,7 +27,7 @@
 
     initialize: function () {
       this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
-      this.api = new BM.Api('/locations', _.bind(this.showBus, this));
+      this.api = new BM.Api( this.url , _.bind(this.showBus, this));
       this.api.fetch();
     },
 
@@ -87,17 +88,25 @@
 
       _.delay(_.bind(this.refresh, this), this.refreshInterval);
 
-      // only show markers that are in the viewport
-      // @todo needs to be implemented
-      google.maps.event.addListener(this.map, 'idle', this.showMarkers);
+      // After next refresh, only show markers that are in the viewport
+      // @todo Where should this listener go? works here..
+      google.maps.event.addListener(this.map, 'idle', this.getViewport(this.map));
     },
 
+    // Get latest vehicle location data.
+    // Note: this.url is re-defined by this.getViewport()
     refresh: function () {
+      this.api = new BM.Api( this.url , _.bind(this.showBus, this));
       this.api.fetch();
     },
 
-    showMarkers: function () {
-      // nothing here yet...
+    // Set this.url with the viewport bounds
+    //
+    getViewport: function (map) {
+      this.url = '/locations?nelat=' + map.getBounds().getNorthEast().lat()
+                 + '&nelon=' + map.getBounds().getNorthEast().lng()
+                 + '&swlat=' + map.getBounds().getSouthWest().lat()
+                 + '&swlon=' + map.getBounds().getSouthWest().lng();
     },
 
     // determine direction - KISS: N, S, E or W
@@ -124,6 +133,7 @@
   };
 
   // when google map loads we kick off the module...
+  // @todo get viewport bounds here, so we only load whats needed
   google.maps.event.addDomListener(window, 'load', _.bind(BM.map.initialize, BM.map));
 
 }());
