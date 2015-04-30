@@ -9,6 +9,7 @@
     api: null,
     labels: [],
     arrows: [],
+    markers: [],
     refreshInterval: 5000,
     url: 'locations',
     mapOptions: {
@@ -47,6 +48,7 @@
       var arrow, mapLabel, lineSymbol, arr, lineCoordinates;
 
       this.clearAll();
+
       // iterate through all the vehicles
       _.each(buses, function (bus) {
         // Display Bus route number
@@ -59,38 +61,46 @@
           align: 'center',
           minZoom: 15
         });
-
+       
         // Display bearing as a fancy arrow
         lineSymbol = {
           path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
         };
 
-        arr = this.getBearingCoor(bus[1], bus[2], bus[3]);
+        //arr = this.getBearingCoor(bus[1], bus[2], bus[3]);
 
-        lineCoordinates = [
-          new google.maps.LatLng(bus[1], bus[2]),
-          new google.maps.LatLng(arr[0], arr[1]),
-        ];
+        //lineCoordinates = [
+        //  new google.maps.LatLng(bus[1], bus[2]),
+        //  new google.maps.LatLng(arr[0], arr[1]),
+        //];
 
-        arrow = new google.maps.Polyline({
-          path: lineCoordinates,
-          icons: [{
-            icon: lineSymbol,
-            offset: '100%'
-          }],
-          map: this.map
-        });
+        //arrow = new google.maps.Polyline({
+        //  path: lineCoordinates,
+        //  icons: [{
+        //    icon: lineSymbol,
+        //    offset: '100%'
+        //  }],
+        //  map: this.map
+        //});
 
-        this.labels.push(mapLabel);
+        //this.labels.push(mapLabel);
         this.arrows.push(arrow);
 
+        var latLng = new google.maps.LatLng(bus[1], bus[2]);
+        var marker = new google.maps.Marker({
+          position: latLng
+        });
+        this.markers.push(marker);
       }, this);
 
-      _.delay(_.bind(this.refresh, this), this.refreshInterval);
+      console.log(this.arrows);
+      var markerCluster = new MarkerClusterer(this.map, this.markers);
 
       // After next refresh, only show markers that are in the viewport
       // @todo Where should this listener go? works here..
-      google.maps.event.addListener(this.map, 'idle', _.bind(this.getViewport, this));
+      //google.maps.event.addListener(this.map, 'idle', _.bind(this.getViewport, this));
+
+      //_.delay(_.bind(this.refresh, this), this.refreshInterval);
     },
 
     // Get latest vehicle location data.
