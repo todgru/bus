@@ -90,7 +90,7 @@
 
       // After next refresh, only show markers that are in the viewport
       // @todo Where should this listener go? works here..
-      google.maps.event.addListener(this.map, 'idle', this.getViewport(this.map));
+      google.maps.event.addListener(this.map, 'idle', _.bind(this.getViewport, this));
     },
 
     // Get latest vehicle location data.
@@ -102,11 +102,11 @@
 
     // Set this.url with the viewport bounds
     //
-    getViewport: function (map) {
-      this.url = 'locations?nelat=' + map.getBounds().getNorthEast().lat()
-                 + '&nelon=' + map.getBounds().getNorthEast().lng()
-                 + '&swlat=' + map.getBounds().getSouthWest().lat()
-                 + '&swlon=' + map.getBounds().getSouthWest().lng();
+    getViewport: function () {
+      this.url = 'locations?nelat=' + this.map.getBounds().getNorthEast().lat()
+                 + '&nelon=' + this.map.getBounds().getNorthEast().lng()
+                 + '&swlat=' + this.map.getBounds().getSouthWest().lat()
+                 + '&swlon=' + this.map.getBounds().getSouthWest().lng();
     },
 
     // determine direction - KISS: N, S, E or W
