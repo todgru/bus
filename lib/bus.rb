@@ -9,7 +9,7 @@ class Bus
   #
   def locations
     result_set = Array.new
-    Trimet::get_all_vehicles['resultSet']['vehicle'].each do |hash|
+    Trimet::get_all_vehicles.each do |hash|
       result_set.push (Hash[hash.map{ |k, v| [k.to_sym, v] }])
     end
 

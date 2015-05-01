@@ -3,14 +3,9 @@ module Trimet
   # return all vehicle locations and relative data
   #
   def self.get_all_vehicles
-    response = Unirest.get( "http://developer.trimet.org/ws/v2/vehicles?appid=#{ENV['TRIMET_APP_ID']}" )
-    
-    if response.code > 200
-      # if not a 200 throw the error
-      halt response.code, {'Content-Type' => 'text/json'}, response.body.to_s
-    end
-    
-    response.body
+    c = Cache.new
+    c.url = "http://developer.trimet.org/ws/v2/vehicles?appid=#{ENV['TRIMET_APP_ID']}"
+    c.get['resultSet']['vehicle']
   end
 
   # test
