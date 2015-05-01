@@ -74,6 +74,7 @@
     },
 
     showBus: function (buses) {
+      document.getElementById('map-canvas').removeAttr('class');
       var arrow, mapLabel, lineSymbol, arr, lineCoordinates;
 
       this.clearAll();
