@@ -3,3 +3,9 @@ html, body, #map-canvas {
   margin: 0px;
   padding: 0px
 }
+
+#map-canvas.loading {
+  background-image: url('/img/spinner.gif');
+  background-position: center center;
+  background-repeat: no-repeat;
+}
