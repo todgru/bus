@@ -18,6 +18,7 @@ GEM
       rack
     rdoc (4.2.0)
       json (~> 1.4)
+    redis (3.2.1)
     rest-client (1.6.8)
       mime-types (~> 1.16)
       rdoc (>= 2.4.2)
@@ -43,6 +44,7 @@ DEPENDENCIES
   dotenv
   json
   pry
+  redis
   shotgun
   sinatra
   unirest
