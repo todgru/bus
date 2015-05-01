@@ -57,6 +57,7 @@
 
     buildMap: function () {
       this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
+      google.maps.event.addListener(this.map, 'idle', _.bind(this.getViewport, this));
       this.api = new BM.Api( this.url , _.bind(this.showBus, this));
       this.api.fetch();
     },
