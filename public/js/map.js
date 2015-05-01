@@ -167,5 +167,3 @@
   google.maps.event.addDomListener(window, 'load', _.bind(BM.map.initialize, BM.map));
 
 }());
-
-
