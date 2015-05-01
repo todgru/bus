@@ -4,6 +4,8 @@ Bundler.require(:default)
 Dotenv.load
 Dir[File.join(File.dirname(__FILE__), 'lib', '**', '*.rb')].each {|file| require file }
 
+$redis = Redis.new
+
 get '/?' do
   erb :map
 end
