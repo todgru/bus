@@ -16,8 +16,14 @@ Sinatra, Google Maps and Trimet API.
 
 **Running the server**
 
+install Redis
+``` bash
+$ brew install redis
+```
+
 ``` bash
 $ bundle install
+$ redis-server
 $ shotgun app.rb
 ```
 
