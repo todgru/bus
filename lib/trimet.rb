@@ -5,7 +5,7 @@ module Trimet
   def self.get_all_vehicles
     c = Cache.new
     c.url = "http://developer.trimet.org/ws/v2/vehicles?appid=#{ENV['TRIMET_APP_ID']}"
-    c.get 
+    c.get['resultSet']['vehicle']
   end
 
   # test

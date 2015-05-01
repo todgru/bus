@@ -9,7 +9,7 @@ class Cache
     @redis = $redis
 
     # set default value of exipre time
-    @expire = 30 if @expire.nil?
+    @expire = 300 if @expire.nil?
 
     # set default round down time
     @round = 5 if @round.nil?
@@ -36,16 +36,21 @@ class Cache
 
   private
 
-  # Get value from redis
+  # Get value from redis, stored as JSON
   #
   def redis_lookup
-    @redis.get( key )
+    r = @redis.get( key )
+    if r
+      return JSON.parse(r)
+    else
+      return nil
+    end
   end
 
-  # Write value to redis
+  # Write JSON value to redis
   #
   def redis_write(value)
-    @redis.setex( key, expire, value )
+    @redis.setex( key, expire, JSON.generate(value) )
   end
 
   # Seconds to key expires
@@ -55,6 +60,7 @@ class Cache
 
   # Make http request for data for the givel url
   # @todo what if there are speacial headers that need to be set?
+  # @note Unirest returns object NOT JSON.
   #
   def get_request_data
     response = Unirest.get( @url )
