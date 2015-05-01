@@ -3,10 +3,16 @@
 #
 class Cache
 
-  attr_writer :url
+  attr_writer :url, :expire, :round
 
   def initialize
     @redis = $redis
+
+    # set default value of exipre time
+    @expire = 30 if @expire.nil?
+
+    # set default round down time
+    @round = 5 if @round.nil?
   end
 
   # for this timestamp
@@ -33,13 +39,18 @@ class Cache
   # Get value from redis
   #
   def redis_lookup
-    @redis.hget( key, field )
+    @redis.get( key )
   end
 
   # Write value to redis
   #
   def redis_write(value)
-    @redis.hset( key, field, value )
+    @redis.setex( key, expire, value )
+  end
+
+  # Seconds to key expires
+  def expire
+    @expire
   end
 
   # Make http request for data for the givel url
@@ -63,14 +74,14 @@ class Cache
   # Redis key name
   #
   def key
-    'bus:cache'
+    "bus:cache:#{field}"
   end
 
   # round down to the nearest 5 second increment
   # 1430443508 becomes 1430443505
   # 1430443503 becomes 1430443500
   #
-  def round_off(timestamp, seconds = 5)
+  def round_off(timestamp, seconds = round)
     (( timestamp / seconds).floor) * seconds
   end
 
@@ -78,6 +89,10 @@ class Cache
   #
   def now
     Time.now.to_i
+  end
+
+  def round
+    @round
   end
 
 end
