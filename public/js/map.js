@@ -1,4 +1,4 @@
-/*global google, BM, MapLabel, alert, navigator, GeolocationMarker*/
+/*global google, BM, MapLabel, alert, navigator, GeolocationMarker, MarkerClusterer*/
 
 (function () {
   "use strict";
@@ -12,7 +12,6 @@
     markers: [],
     refreshInterval: 5000,
     locationMarker: null,
-    url: 'locations',
     mapOptions: {
       zoom: 14,
       center: {}
@@ -58,9 +57,8 @@
 
     buildMap: function () {
       this.map  = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
-      google.maps.event.addListener(this.map, 'idle', _.bind(this.getViewport, this));
-      this.api = new BM.Api( this.url , _.bind(this.showBus, this));
-      this.api.fetch();
+      this.api = new BM.Api(this.map, _.bind(this.showBus, this));
+      google.maps.event.addListener(this.map, 'idle', _.bind(this.refresh, this));
     },
 
     clearAll: function () {
@@ -92,11 +90,11 @@
           align: 'center',
           minZoom: 15
         });
-       
+
         // Display bearing as a fancy arrow
-        lineSymbol = {
-          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
-        };
+        // lineSymbol = {
+        //   path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
+        // };
 
         //arr = this.getBearingCoor(bus[1], bus[2], bus[3]);
 
@@ -114,17 +112,19 @@
         //  map: this.map
         //});
 
-        //this.labels.push(mapLabel);
-        this.arrows.push(arrow);
+        // this.arrows.push(arrow);
 
         var latLng = new google.maps.LatLng(bus[1], bus[2]);
         var marker = new google.maps.Marker({
           position: latLng
         });
+
+        this.labels.push(mapLabel);
         this.markers.push(marker);
+
       }, this);
 
-      console.log(this.arrows);
+      // console.log(this.arrows);
       var markerCluster = new MarkerClusterer(this.map, this.markers);
 
       // After next refresh, only show markers that are in the viewport
@@ -135,19 +135,8 @@
     },
 
     // Get latest vehicle location data.
-    // Note: this.url is re-defined by this.getViewport()
     refresh: function () {
-      this.api = new BM.Api( this.url , _.bind(this.showBus, this));
       this.api.fetch();
-    },
-
-    // Set this.url with the viewport bounds
-    //
-    getViewport: function () {
-      this.url = 'locations?nelat=' + this.map.getBounds().getNorthEast().lat()
-                 + '&nelon=' + this.map.getBounds().getNorthEast().lng()
-                 + '&swlat=' + this.map.getBounds().getSouthWest().lat()
-                 + '&swlon=' + this.map.getBounds().getSouthWest().lng();
     },
 
     // determine direction - KISS: N, S, E or W
