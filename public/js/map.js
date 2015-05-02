@@ -10,6 +10,7 @@
     labels: [],
     arrows: [],
     markers: [],
+    cluster: null,
     refreshInterval: 5000,
     locationMarker: null,
     mapOptions: {
@@ -62,6 +63,10 @@
     },
 
     clearAll: function () {
+      if (this.markerCluster) {
+        this.markerCluster.clearMarkers();
+      }
+      
       _.each(this.labels, function (label) {
         label.setMap(null);
       }, this);
@@ -74,10 +79,9 @@
     },
 
     showBus: function (buses) {
+      document.getElementById('load-indicator').removeAttribute('class');
       document.getElementById('map-canvas').removeAttribute('class');
       var arrow, mapLabel, lineSymbol, arr, lineCoordinates;
-
-      this.clearAll();
 
       // iterate through all the vehicles
       _.each(buses, function (bus) {
@@ -124,9 +128,10 @@
         this.markers.push(marker);
 
       }, this);
-
-      // console.log(this.arrows);
-      var markerCluster = new MarkerClusterer(this.map, this.markers);
+      
+      this.markerCluster = new MarkerClusterer(this.map, this.markers);
+      this.markerCluster.setMaxZoom(15);
+      
 
       // After next refresh, only show markers that are in the viewport
       // @todo Where should this listener go? works here..
@@ -137,6 +142,8 @@
 
     // Get latest vehicle location data.
     refresh: function () {
+      document.getElementById('load-indicator').setAttribute('class', 'loading');
+      this.clearAll();
       this.api.fetch();
     },
 

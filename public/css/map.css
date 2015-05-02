@@ -4,8 +4,26 @@ html, body, #map-canvas {
   padding: 0px
 }
 
-#map-canvas.loading {
+#map-canvas.loading, #load-indicator {
   background-image: url('/img/spinner.gif');
   background-position: center center;
   background-repeat: no-repeat;
+}
+
+#load-indicator {
+  border-radius: 5px;
+  background-clip: padding-box;
+  -webkit-box-shadow: 2px 2px 2px 0px #999;
+  box-shadow: 2px 2px 2px 0px #999;
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  top: 20px;
+  left: 20px;
+  background-color: white; 
+  display: none;
+}
+
+#load-indicator.loading {
+  display: inline-block;
 }
